@@ -46,11 +46,13 @@ ColorGrid getImage(const ElevationData& elev_data) {
   ColorGrid cg (rows,cols);
 	int v;
 	double t;
+	int color;
 	for (int i = 0; i < rows; i++){
 		for (int j = 0; j < cols; j++){
 			v = elev_data.getVal(i,j);
 			t = get_t(elevMin, elevMax, v);
-			cg.set(i, j, lerp(0., 255., t));
+			color = lerp(0., 255., t);
+			cg.set(i, j, Color(color,color,color));
 		}
 	}
   
@@ -67,6 +69,15 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
   //
   // Write path to the colorgrid
 	//
+	//
+	//
+// FOR JACKSON // Iterations move right one, and each time the iteration ends it updates currRow 
+	// up one, down one, or the same level depending on which path is best. To handle when the path reaches the edge,
+	// create if statements for if the cells checked are within the bounds (> 0, < Rows). If the cell does not
+	// exist within the bounds, don't check it (this will avoid the error). This means that it should still check
+	// the middle and bottom rows or vice versa and can continue onwards.
+	// After that is handled, the other four edge cases can be handled. I think randomly choosing between equal paths
+	// should suffice in edge case 4.
 	int currRow = startRow;
 	for (int i = 0; i < elev_data.getCols(); i++) {
 		
