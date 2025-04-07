@@ -7,6 +7,8 @@
 #include <sstream>
 #include <string>
 #include <limits>
+//we added this v
+#include <cmath>
 
 #include "DataSource.h"
 #include "data_src/ElevationData.h"
@@ -19,6 +21,9 @@ using namespace bridges;
 
 // takes in the processed elevation data and returns a color grid for
 // visualization using BRIDGES
+double get_t(int a, int b, double v) { //a is min, b is max, v is current data value
+	return (v - a)/(b - a);
+}
 ColorGrid getImage(const ElevationData& elev_data) {
   //TODO
   //
