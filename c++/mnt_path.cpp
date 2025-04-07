@@ -66,6 +66,13 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
   // by minimizing the difference of elevation.
   //
   // Write path to the colorgrid
+	//
+	int currRow = startRow;
+	for (int i = 0; i < elev_data.getCols(); i++) {
+		
+	}
+	//
+	//
 }
 
 int main(int argc, char **argv) {
