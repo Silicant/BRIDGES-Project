@@ -16,7 +16,7 @@
 using namespace std;
 using namespace bridges;
 
-// This program implements the mountain paths assignment in C++. See the README.md for a
+//` This program implements the mountain paths assignment in C++. See the README.md for a
 // detailed description
 
 // takes in the processed elevation data and returns a color grid for
