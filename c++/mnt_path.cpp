@@ -24,6 +24,10 @@ ColorGrid getImage(const ElevationData& elev_data) {
   //
   //return a Color Grid that represents the elevation as gray scale
   //
+	//
+	// use the elevation to print the level of color like a topography map
+	//
+	//
   // access elevation with elev_data.getVal(row, col)
   // compute the intensity by linear interpolation between elev_data.getMinVal(); and elev_data.getMaxVal();
   //
