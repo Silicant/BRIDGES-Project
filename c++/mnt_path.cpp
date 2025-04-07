@@ -9,6 +9,7 @@
 #include <limits>
 //we added this v
 #include <cmath>
+#include <numeric>
 
 #include "DataSource.h"
 #include "data_src/ElevationData.h"
@@ -18,11 +19,10 @@ using namespace bridges;
 // This program implements the mountain paths assignment in C++. See the README.md for a
 // detailed description
 
-
 // takes in the processed elevation data and returns a color grid for
 // visualization using BRIDGES
-double get_t(int a, int b, double v) { //a is min, b is max, v is current data value
-	return (v - a)/(b - a);
+double get_t(int a, int b, int v) { //a is min, b is max, v is current data value
+	return (static_cast<double>(v - a) / static_cast<double>(b - a));
 }
 ColorGrid getImage(const ElevationData& elev_data) {
   //TODO
@@ -36,16 +36,21 @@ ColorGrid getImage(const ElevationData& elev_data) {
   // access elevation with elev_data.getVal(row, col)
   // compute the intensity by linear interpolation between elev_data.getMinVal(); and elev_data.getMaxVal();
   //
-	int elevMin = elev_data.getMinVal();
-	int elevMax = elev_data.getMaxVal();
+	int rows = elev_data.getRows();
+	int cols = elev_data.getCols();
+	double elevMin = elev_data.getMinVal();
+	double elevMax = elev_data.getMaxVal();
 
   // create ColorGrid with ColorGrid(nbrows, nbcols)
   // fill ColorGrid with .set(row, col, color)
-  ColorGrid cg (1,1);
-
-	for (int i = 0; i < nbrows; i++){
-		for (int j = 0; j < nbcols; j++){
-			cg.set(i, j, [color]);
+  ColorGrid cg (rows,cols);
+	int v;
+	double t;
+	for (int i = 0; i < rows; i++){
+		for (int j = 0; j < cols; j++){
+			v = elev_data.getVal(i,j);
+			t = get_t(elevMin, elevMax, v);
+			cg.set(i, j, lerp(0., 255., t));
 		}
 	}
   
