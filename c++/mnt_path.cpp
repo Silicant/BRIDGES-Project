@@ -31,9 +31,18 @@ ColorGrid getImage(const ElevationData& elev_data) {
   // access elevation with elev_data.getVal(row, col)
   // compute the intensity by linear interpolation between elev_data.getMinVal(); and elev_data.getMaxVal();
   //
+	int elevMin = elev_data.getMinVal();
+	int elevMax = elev_data.getMaxVal();
+
   // create ColorGrid with ColorGrid(nbrows, nbcols)
   // fill ColorGrid with .set(row, col, color)
   ColorGrid cg (1,1);
+
+	for (int i = 0; i < nbrows; i++){
+		for (int j = 0; j < nbcols; j++){
+			cg.set(i, j, [color]);
+		}
+	}
   
   return cg;
 }
