@@ -72,24 +72,27 @@ struct Point {
 
 };
 
-pair<int,int> compare(int currRow, int currCol, const ElevationData& elev_data) {
+pair<int,int> compare(int& currRow, int currCol, const ElevationData& elev_data) {
 	int curr = elev_data.getVal(currRow, currCol);
 	Point top(curr - elev_data.getVal(currRow + 1, currCol + 1), currRow+1, currCol+1);
 	Point middle(curr - elev_data.getVal(currRow + 1, currCol), currRow + 1, currCol);
 	Point bottom(curr - elev_data.getVal(currRow + 1, currCol - 1), currRow + 1, currCol - 1);
 	pair<int,int> ret;
-	if(middle.cmp < top.cmp && middle.cmp < bottom.cmp) { //Case 2 & 3 forward perferred
+	if(middle.cmp < top.cmp ||  middle.cmp < bottom.cmp) { //Case 2 & 3 forward perferred
 		ret = {middle.row, middle.col};
 	}
 	else if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
 		ret = {bottom.row, bottom.col};
+		currRow--;
 	}
 	else if(top.cmp == bottom.cmp) { //case 4
 		if(rand() % 2) {
 			ret = {top.row,bottom.col};
+			currRow++;
 		}
 		else {
 			ret = {bottom.row, bottom.col};
+			currRow--;
 		}
 	}
 	return ret;	
@@ -107,7 +110,7 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
   // Write path to the colorgrid
 	//
 	//
-	//
+	//`
 // FOR JACKSON // Iterations move right one, and each time the iteration ends it updates currRow 
 	// up one, down one, or the same level depending on which path is best. To handle when the path reaches the edge,
 	// create if statements for if the cells checked are within the bounds (> 0, < Rows). If the cell does not
@@ -115,15 +118,15 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	// the middle and bottom rows or vice versa and can continue onwards.
 	// After that is handled, the other four edge cases can be handled. I think randomly choosing between equal paths
 	// should suffice in edge case 4.
-	int* currRow = new int(startRow);
-	int* currCol = new int(0);
+	int currRow = startRow;
+	int currCol = 0;
 	for (int i = 0; i < elev_data.getCols(); i++) {
 		if(currRow == elev_data.getRows()) break;
-		auto [nextRow, nextCol] = compare(currRow, i, elev_data);
+		auto [nextRow, nextCol] = compare(currRow, currCol, elev_data);
 		cg.set(nextRow, nextCol, Color(255,0,0));
+		currCol++;
 	}
-	delete currRow;
-	delete currCol;
+
 	//
 	//
 }
@@ -135,7 +138,7 @@ int main(int argc, char **argv) {
 
 
   // initialize Bridges
-  Bridges bridges(1, "jDoug", "1217888151182");
+  Bridges bridges(2, "jDoug", "1217888151182");
 
   // defaults for row number and data file
   int startRow = 50;
