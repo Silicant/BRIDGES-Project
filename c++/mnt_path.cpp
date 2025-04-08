@@ -52,7 +52,7 @@ ColorGrid getImage(const ElevationData& elev_data) {
 	double t;
 	int color;
 	for (int i = 0; i < rows; i++){
-		for (int j = 0; j < cols; j++){
+		for (int j = 0; j < cols; j++) {
 			v = elev_data.getVal(i,j);
 			t = get_t(elevMin, elevMax, v);
 			color = lerp(0., 255., t);
@@ -62,6 +62,39 @@ ColorGrid getImage(const ElevationData& elev_data) {
   
   return cg;
 }
+
+struct Point {
+	int cmp; //elevation differnce from curr
+	int row;
+	int col;
+
+	Point(int new_elev, int new_row, int new_col) : cmp(abs(new_elev)), row(abs(new_row)), col(abs(new_col)) {}
+
+};
+
+pair<int,int> compare(int currRow, int currCol, const ElevationData& elev_data) {
+	int curr = elev_data.getVal(currRow, currCol);
+	Point top(curr - elev_data.getVal(currRow + 1, currCol + 1), currRow+1, currCol+1);
+	Point middle(curr - elev_data.getVal(currRow + 1, currCol), currRow + 1, currCol);
+	Point bottom(curr - elev_data.getVal(currRow + 1, currCol - 1), currRow + 1, currCol - 1);
+	pair<int,int> ret;
+	if(middle.cmp < top.cmp && middle.cmp < bottom.cmp) { //Case 2 & 3 forward perferred
+		ret = {middle.row, middle.col};
+	}
+	else if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
+		ret = {bottom.row, bottom.col};
+	}
+	else if(top.cmp == bottom.cmp) { //case 4
+		if(rand() % 2) {
+			ret = {top.row,bottom.col};
+		}
+		else {
+			ret = {bottom.row, bottom.col};
+		}
+	}
+	return ret;	
+}
+
 
 // determines the least effort path through the mountain starting a point on
 // the left edge of the image
@@ -82,65 +115,18 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	// the middle and bottom rows or vice versa and can continue onwards.
 	// After that is handled, the other four edge cases can be handled. I think randomly choosing between equal paths
 	// should suffice in edge case 4.
-
-	/*class NextThree {
-		public:
-		int curr;
-
-		int top;
-		int middle;
-		int bottom;
-
-		NextThree(int nCurr = 0, int nTop=0, int nMiddle=0, int nBottom=0) : curr(nCurr), top(nTop), middle(nMiddle), bottom(nBottom) {
-
-		}
-		
-		void setNextThree(int currRow, int currCol) {
-			curr = elev_data.getVal(currRow, currCol);
-			 top = elev_data.getVal(currRow + 1, currCol + 1);
-			 middle = elev_data.getVal(currRow + 1, currCol);
-			 bottom = elev_data.getVal(currRow + 1, currCol - 1);
-		}
-		pair<int, int> compare(int currRows, int currCols) {
-			return pair<int,int>(1,1);
-		}
-		
-		
-
-	}; */
-	NextThree nextThreeVals;
-
-	int currRow = startRow;
+	int* currRow = new int(startRow);
+	int* currCol = new int(0);
 	for (int i = 0; i < elev_data.getCols(); i++) {
 		if(currRow == elev_data.getRows()) break;
-		auto [nextRow, nextCol] = compare(currRow, i);
-
-
-		nextThreeVals.setNextThree(currRow, i);
+		auto [nextRow, nextCol] = compare(currRow, i, elev_data);
+		cg.set(nextRow, nextCol, Color(255,0,0));
 	}
+	delete currRow;
+	delete currCol;
 	//
 	//
 }
-struct Point {
-	int cmp; //elevation differnce from curr
-	int row;
-	int col;
-
-	Point(int new_elev, int new_row, int new_col) : elev_cmp(abs(new_elev)), row(abs(new_row)), col(abs(new_col)) {}
-
-};
-pair<int,int> compare(int currRows, int currCols) {
-	int curr = elev_data.getVal(currRow, currCols);
-	Point top(curr - elev_data.getVal(currRow + 1, currCol + 1), currRow+1, currCol+1);
-	Point middle(curr - elev_data.getVal(currRow + 1, currCol, currRow + 1, currCol);
-	Point bottom(curr - elev_data.getVal(currRow + 1, currCol - 1), currRow + 1, currCol - 1);
-	if(1) {}
-	else if(1)
-	else if(1) {}
-	else if(top.cmp == bottom.cmp) {}
-	
-}
-
 
 int main(int argc, char **argv) {
 	srand(time(0));
