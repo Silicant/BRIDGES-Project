@@ -78,10 +78,10 @@ pair<int,int> compare(int& currRow, int currCol, const ElevationData& elev_data)
 	Point middle(curr - elev_data.getVal(currRow + 1, currCol), currRow + 1, currCol);
 	Point bottom(curr - elev_data.getVal(currRow + 1, currCol - 1), currRow + 1, currCol - 1);
 	pair<int,int> ret;
-	if(middle.cmp < top.cmp ||  middle.cmp < bottom.cmp) { //Case 2 & 3 forward perferred
+	if(middle.cmp < top.cmp || middle.cmp < bottom.cmp) { //Case 2 & 3 forward perferred
 		ret = {middle.row, middle.col};
 	}
-	else if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
+	else if(bottom.cmp < middle.cmp ||  bottom.cmp < top.cmp) { //case 1
 		ret = {bottom.row, bottom.col};
 		currRow--;
 	}
@@ -124,7 +124,7 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 		if(currRow == elev_data.getRows()) break;
 		auto [nextRow, nextCol] = compare(currRow, currCol, elev_data);
 		cg.set(nextRow, nextCol, Color(255,0,0));
-		currCol++;
+		currCol++; //we know that it will always move forward no matter what
 	}
 
 	//
