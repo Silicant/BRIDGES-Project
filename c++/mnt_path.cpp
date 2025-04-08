@@ -74,18 +74,21 @@ struct Point {
 
 pair<int,int> compare(int& currRow, int currCol, const ElevationData& elev_data) {
 	int curr = elev_data.getVal(currRow, currCol);
+	//top is fine
 	Point top(curr - elev_data.getVal(currRow + 1, currCol + 1), currRow+1, currCol+1);
-	Point middle(curr - elev_data.getVal(currRow + 1, currCol), currRow + 1, currCol);
-	Point bottom(curr - elev_data.getVal(currRow + 1, currCol - 1), currRow + 1, currCol - 1);
-	pair<int,int> ret;
-	if(middle.cmp < top.cmp || middle.cmp < bottom.cmp) { //Case 2 & 3 forward perferred
+	//middle is right?
+	Point middle(curr - elev_data.getVal(currRow, currCol+1), currRow, currCol+1); //I HAVE CHANGED THIS
+	//bottom is wrong y is rows, x is cols
+	Point bottom(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol + 1); //THIS LINE BREAKS THINGS TODO
+	pair<int,int> ret = {currRow, currCol};
+	if(middle.cmp <= top.cmp && middle.cmp <= bottom.cmp) { //Case 2 & 3 forward perferred
 		ret = {middle.row, middle.col};
 	}
-	else if(bottom.cmp < middle.cmp ||  bottom.cmp < top.cmp) { //case 1
+	else if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
 		ret = {bottom.row, bottom.col};
 		currRow--;
 	}
-	else if(top.cmp == bottom.cmp) { //case 4
+   else	if(top.cmp == bottom.cmp) { //case 4
 		if(rand() % 2) {
 			ret = {top.row,bottom.col};
 			currRow++;
@@ -120,10 +123,11 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	// should suffice in edge case 4.
 	int currRow = startRow;
 	int currCol = 0;
+	cg.set(startRow, 0, Color(0,255,0));
 	for (int i = 0; i < elev_data.getCols(); i++) {
 		if(currRow == elev_data.getRows()) break;
 		auto [nextRow, nextCol] = compare(currRow, currCol, elev_data);
-		cg.set(nextRow, nextCol, Color(255,0,0));
+		cg.set(nextRow, nextCol, Color(255,0,0)); //check this out next TODO
 		currCol++; //we know that it will always move forward no matter what
 	}
 
@@ -138,7 +142,7 @@ int main(int argc, char **argv) {
 
 
   // initialize Bridges
-  Bridges bridges(2, "jDoug", "1217888151182");
+  Bridges bridges(3, "jDoug", "1217888151182");
 
   // defaults for row number and data file
   int startRow = 50;
