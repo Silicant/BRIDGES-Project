@@ -10,6 +10,10 @@
 //we added this v
 #include <cmath>
 #include <numeric>
+#include <ctime>
+#include <cstdlib>
+#include <utility>
+#include <algorithm>
 
 #include "DataSource.h"
 #include "data_src/ElevationData.h"
@@ -25,7 +29,7 @@ double get_t(int a, int b, int v) { //a is min, b is max, v is current data valu
 	return (static_cast<double>(v - a) / static_cast<double>(b - a));
 }
 ColorGrid getImage(const ElevationData& elev_data) {
-  //TODO
+  //DONE
   //
   //return a Color Grid that represents the elevation as gray scale
   //
@@ -78,21 +82,74 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	// the middle and bottom rows or vice versa and can continue onwards.
 	// After that is handled, the other four edge cases can be handled. I think randomly choosing between equal paths
 	// should suffice in edge case 4.
+
+	/*class NextThree {
+		public:
+		int curr;
+
+		int top;
+		int middle;
+		int bottom;
+
+		NextThree(int nCurr = 0, int nTop=0, int nMiddle=0, int nBottom=0) : curr(nCurr), top(nTop), middle(nMiddle), bottom(nBottom) {
+
+		}
+		
+		void setNextThree(int currRow, int currCol) {
+			curr = elev_data.getVal(currRow, currCol);
+			 top = elev_data.getVal(currRow + 1, currCol + 1);
+			 middle = elev_data.getVal(currRow + 1, currCol);
+			 bottom = elev_data.getVal(currRow + 1, currCol - 1);
+		}
+		pair<int, int> compare(int currRows, int currCols) {
+			return pair<int,int>(1,1);
+		}
+		
+		
+
+	}; */
+	NextThree nextThreeVals;
+
 	int currRow = startRow;
 	for (int i = 0; i < elev_data.getCols(); i++) {
-		
+		if(currRow == elev_data.getRows()) break;
+		auto [nextRow, nextCol] = compare(currRow, i);
+
+
+		nextThreeVals.setNextThree(currRow, i);
 	}
 	//
 	//
 }
+struct Point {
+	int cmp; //elevation differnce from curr
+	int row;
+	int col;
+
+	Point(int new_elev, int new_row, int new_col) : elev_cmp(abs(new_elev)), row(abs(new_row)), col(abs(new_col)) {}
+
+};
+pair<int,int> compare(int currRows, int currCols) {
+	int curr = elev_data.getVal(currRow, currCols);
+	Point top(curr - elev_data.getVal(currRow + 1, currCol + 1), currRow+1, currCol+1);
+	Point middle(curr - elev_data.getVal(currRow + 1, currCol, currRow + 1, currCol);
+	Point bottom(curr - elev_data.getVal(currRow + 1, currCol - 1), currRow + 1, currCol - 1);
+	if(1) {}
+	else if(1)
+	else if(1) {}
+	else if(top.cmp == bottom.cmp) {}
+	
+}
+
 
 int main(int argc, char **argv) {
+	srand(time(0));
 
   // bridges object initialization
 
 
   // initialize Bridges
-  Bridges bridges(123, "BRIDGES_USER_ID", "BRIDGES_API_KEY");
+  Bridges bridges(1, "jDoug", "1217888151182");
 
   // defaults for row number and data file
   int startRow = 50;
