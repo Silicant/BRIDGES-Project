@@ -74,22 +74,27 @@ struct Point {
 pair<int,int> compare(int currRow, int& currCol, const ElevationData& elev_data) { 
 	int curr = elev_data.getVal(currRow, currCol);
 	//top is fixed
-	Point top(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol+1); //I HAVE CHANGED THIS
+	//if (currRow > 1)
+		Point top(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol+1); //I HAVE CHANGED THIS
+	
 	//middle is right?
 	Point middle(curr - elev_data.getVal(currRow, currCol+1), currRow, currCol+1); //I HAVE CHANGED THIS
 	//bottom is wrong y is rows, x is cols
-	Point bottom(curr - elev_data.getVal(currRow + 1 , currCol + 1), currRow + 1, currCol + 1); 
+	//if (currRow < elev_data.getRows())
+		Point bottom(curr - elev_data.getVal(currRow + 1 , currCol + 1), currRow + 1, currCol + 1); 
+	
 
 	pair<int,int> ret = {currRow, currCol};
 
-	if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
+
+	if (bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
 		ret = {bottom.row, bottom.col};
 	}
-	else if(middle.cmp <= top.cmp && middle.cmp <= bottom.cmp) { //case 2, 3
+	else if (middle.cmp <= top.cmp && middle.cmp <= bottom.cmp) { //case 2, 3
 		ret = {middle.row, middle.col};
 	}
-   else	if(top.cmp == bottom.cmp) { //case 4
-		if(rand() % 2 == 0) {
+    else if (top.cmp == bottom.cmp) { //case 4
+		if (rand() % 2 == 0) {
 			ret = {top.row,top.col};
 		}
 		else {
@@ -118,14 +123,15 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	// After that is handled, the other four edge cases can be handled. I think randomly choosing between equal paths
 	// should suffice in edge case 4.
 	int currRow = startRow;
-	int currCol = 0;
 	cg.set(startRow, 0, Color(0,255,0));
 	for (int i = 0; i < elev_data.getCols(); i++) {
-		if(currRow == elev_data.getRows()) break;
-		auto [nextRow, nextCol] = compare(currRow, currCol, elev_data);
+		//if(currRow == elev_data.getRows()) break;
+		auto [nextRow, nextCol] = compare(currRow, i, elev_data);
 		cg.set(nextRow, nextCol, Color(255,0,0)); 
 		currRow = nextRow;
-		currCol = nextCol; //this is broken? TODO
+		//this is broken? TODO 
+			// i (the iterator) handles which column we're in. There is never a case in which we remain in the same column
+			// after an iteration, so i just serves the purpose of currCol at all times.
 
 	}
 }
