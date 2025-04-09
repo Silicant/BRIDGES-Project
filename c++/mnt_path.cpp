@@ -59,6 +59,7 @@ ColorGrid getImage(const ElevationData& elev_data) {
 			cg.set(i, j, Color(color,color,color));
 		}
 	}
+	//cout << "I have " << cols << " columns\n";
   
   return cg;
 }
@@ -70,18 +71,14 @@ struct Point {
 	Point(int new_elev, int new_row, int new_col) : cmp(abs(new_elev)), row(abs(new_row)), col(abs(new_col)) {}
 
 };
+
 //returns a pair of the location where the least path of resistance is
-pair<int,int> compare(int currRow, int& currCol, const ElevationData& elev_data) { 
+pair<int,int> compare(int currRow, int currCol, const ElevationData& elev_data) {
 	int curr = elev_data.getVal(currRow, currCol);
-	//top is fixed
-	//if (currRow > 1)
-		Point top(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol+1); //I HAVE CHANGED THIS
-	
-	//middle is right?
-	Point middle(curr - elev_data.getVal(currRow, currCol+1), currRow, currCol+1); //I HAVE CHANGED THIS
-	//bottom is wrong y is rows, x is cols
-	//if (currRow < elev_data.getRows())
-		Point bottom(curr - elev_data.getVal(currRow + 1 , currCol + 1), currRow + 1, currCol + 1); 
+
+	Point top(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol+1); 
+	Point middle(curr - elev_data.getVal(currRow, currCol+1), currRow, currCol+1); 	//y is rows, x is cols
+	Point bottom(curr - elev_data.getVal(currRow + 1 , currCol + 1), currRow + 1, currCol + 1); 
 	
 
 	pair<int,int> ret = {currRow, currCol};
@@ -89,18 +86,28 @@ pair<int,int> compare(int currRow, int& currCol, const ElevationData& elev_data)
 
 	if (bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
 		ret = {bottom.row, bottom.col};
+		//cout << "case1: " <<  bottom.cmp << "\n";
 	}
 	else if (middle.cmp <= top.cmp && middle.cmp <= bottom.cmp) { //case 2, 3
 		ret = {middle.row, middle.col};
+		//cout << "case2/3: " << middle.cmp << "\n";
 	}
-    else if (top.cmp == bottom.cmp) { //case 4
+	else if(top.cmp < middle.cmp && top.cmp < bottom.cmp) { //case for if top is least
+		ret = {top.row, top.col};
+		//cout << "Custom case: " << top.cmp << "\n";
+	}
+	else if (top.cmp - bottom.cmp == 0) { //case 4
 		if (rand() % 2 == 0) {
 			ret = {top.row,top.col};
+			//cout << "case4: " << top.cmp << "\n";
 		}
 		else {
 			ret = {bottom.row, bottom.col};
+			//cout << "case4 bottom: " << bottom.cmp << "\n";
 		}
 	}
+	//cout << ret.first << ", " << ret.second << "\n";
+
    return ret;
 
 }
@@ -123,14 +130,15 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	// After that is handled, the other four edge cases can be handled. I think randomly choosing between equal paths
 	// should suffice in edge case 4.
 	int currRow = startRow;
+	int currCol = 0;
 	cg.set(startRow, 0, Color(0,255,0));
-	for (int i = 0; i < elev_data.getCols(); i++) {
-		//if(currRow == elev_data.getRows()) break;
+	for (int i = 0; i < elev_data.getCols() - 1; i++) {
 		auto [nextRow, nextCol] = compare(currRow, i, elev_data);
 		cg.set(nextRow, nextCol, Color(255,0,0)); 
-		currRow = nextRow;
-		//this is broken? TODO 
-			// i (the iterator) handles which column we're in. There is never a case in which we remain in the same column
+		currRow = nextRow;	
+		//i serves as cols 
+
+		// i (the iterator) handles which column we're in. There is never a case in which we remain in the same column
 			// after an iteration, so i just serves the purpose of currCol at all times.
 
 	}
