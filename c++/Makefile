@@ -12,7 +12,7 @@ TARGET =  all
 
 OBJS = $(SRCS:.cpp=.o)
 
-CXXFLAGS = -g  -std=c++2a $(BRIDGES_CXXFLAGS)
+CXXFLAGS = -g  -std=c++20 $(BRIDGES_CXXFLAGS)
 
 LDFLAGS = -g $(BRIDGES_LDFLAGS) -pthread
 LIBS =  -lcurl -l bridges 

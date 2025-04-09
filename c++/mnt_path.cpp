@@ -67,38 +67,37 @@ struct Point {
 	int cmp; //elevation differnce from curr
 	int row;
 	int col;
-
 	Point(int new_elev, int new_row, int new_col) : cmp(abs(new_elev)), row(abs(new_row)), col(abs(new_col)) {}
 
 };
-
-pair<int,int> compare(int& currRow, int currCol, const ElevationData& elev_data) {
+//returns a pair of the location where the least path of resistance is
+pair<int,int> compare(int currRow, int& currCol, const ElevationData& elev_data) { 
 	int curr = elev_data.getVal(currRow, currCol);
-	//top is fine
-	Point top(curr - elev_data.getVal(currRow + 1, currCol + 1), currRow+1, currCol+1);
+	//top is fixed
+	Point top(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol+1); //I HAVE CHANGED THIS
 	//middle is right?
 	Point middle(curr - elev_data.getVal(currRow, currCol+1), currRow, currCol+1); //I HAVE CHANGED THIS
 	//bottom is wrong y is rows, x is cols
-	Point bottom(curr - elev_data.getVal(currRow - 1, currCol + 1), currRow - 1, currCol + 1); //THIS LINE BREAKS THINGS TODO
+	Point bottom(curr - elev_data.getVal(currRow + 1 , currCol + 1), currRow + 1, currCol + 1); 
+
 	pair<int,int> ret = {currRow, currCol};
-	if(middle.cmp <= top.cmp && middle.cmp <= bottom.cmp) { //Case 2 & 3 forward perferred
+
+	if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
+		ret = {bottom.row, bottom.col};
+	}
+	else if(middle.cmp <= top.cmp && middle.cmp <= bottom.cmp) { //case 2, 3
 		ret = {middle.row, middle.col};
 	}
-	else if(bottom.cmp < middle.cmp && bottom.cmp < top.cmp) { //case 1
-		ret = {bottom.row, bottom.col};
-		currRow--;
-	}
    else	if(top.cmp == bottom.cmp) { //case 4
-		if(rand() % 2) {
-			ret = {top.row,bottom.col};
-			currRow++;
+		if(rand() % 2 == 0) {
+			ret = {top.row,top.col};
 		}
 		else {
 			ret = {bottom.row, bottom.col};
-			currRow--;
 		}
 	}
-	return ret;	
+   return ret;
+
 }
 
 
@@ -106,14 +105,11 @@ pair<int,int> compare(int& currRow, int currCol, const ElevationData& elev_data)
 // the left edge of the image
 void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
   //        Run the greedy path from (0, startRow) to the right of the image
-  //
   // always move right, but select the right cell, the top right cell, or bottom right cell
   // by minimizing the difference of elevation.
-  //
+
   // Write path to the colorgrid
-	//
-	//
-	//`
+
 // FOR JACKSON // Iterations move right one, and each time the iteration ends it updates currRow 
 	// up one, down one, or the same level depending on which path is best. To handle when the path reaches the edge,
 	// create if statements for if the cells checked are within the bounds (> 0, < Rows). If the cell does not
@@ -127,12 +123,11 @@ void findPath(const ElevationData&  elev_data, int startRow, ColorGrid& cg) {
 	for (int i = 0; i < elev_data.getCols(); i++) {
 		if(currRow == elev_data.getRows()) break;
 		auto [nextRow, nextCol] = compare(currRow, currCol, elev_data);
-		cg.set(nextRow, nextCol, Color(255,0,0)); //check this out next TODO
-		currCol++; //we know that it will always move forward no matter what
-	}
+		cg.set(nextRow, nextCol, Color(255,0,0)); 
+		currRow = nextRow;
+		currCol = nextCol; //this is broken? TODO
 
-	//
-	//
+	}
 }
 
 int main(int argc, char **argv) {
@@ -142,7 +137,7 @@ int main(int argc, char **argv) {
 
 
   // initialize Bridges
-  Bridges bridges(3, "jDoug", "1217888151182");
+  Bridges bridges(4, "jDoug", "1217888151182");
 
   // defaults for row number and data file
   int startRow = 50;
